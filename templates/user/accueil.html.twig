@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="mb-5">Gestion des instances minecraft</h1>
+        <div class="row mb-4">
+            <div class="col-6">
+                <input type="text" class="form-control" name="url" id="url" placeholder="Url" aria-label="Url" aria-describedby="Url server">
+            </div>
+            <div class="col-6">
+                <button class="btn btn-primary col-12 mb-5" onclick="valider()">Valider</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        function valider()
+        {
+            let url = $('#url').val();
+            // console.log(url);
+
+            $.ajax({
+                type: "POST",
+                url: "{{ path('get_url') }}",
+                data: {
+                    url: url
+                },
+                success: function (retour) {
+                    console.log(retour);
+                }
+            });
+
+            // let urlSplit = url.split('files/');
+            // console.log(urlSplit);
+            // if(urlSplit[1])
+            // {
+            //     let firstNumber = urlSplit[1].substring(0,4)
+            //     let secondNumber = urlSplit[1].substring(4,7)
+            //
+            //
+            //     // let urlRetour = 'https://media.forgecdn.net/files/' + firstNumber + '/' + secondNumber + '/';
+            // }
+        }
+
+    </script>
+{% endblock %}
