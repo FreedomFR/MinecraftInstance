@@ -25,17 +25,17 @@ services:
     networks:
       dev:
 
-  www:
-    image: php:7.4-apache
-    container_name: www_docker_symfony
-    ports:
-      - "8741:80"
-    volumes:
-      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/php:/etc/apache2/sites-enabled"
-      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/www:/var/www"
-    restart: unless-stopped
-    networks:
-      - dev
+#  www:
+#    image: php:7.4-apache
+#    container_name: www_docker_symfony
+#    ports:
+#      - "8741:80"
+#    volumes:
+#      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/php:/etc/apache2/sites-enabled"
+#      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/www/html:/var/www"
+#    restart: unless-stopped
+#    networks:
+#      - dev
 
 networks:
   dev:
