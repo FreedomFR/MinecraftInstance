@@ -1,0 +1,23 @@
+
+<p>Id du mod: {{ mods.id }}</p><br>
+<p>Nom : {{ mods.name }}</p><br>
+
+<table class="table table-dark table-striped">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nom</th>
+{#        <th scope="col">Url</th>#}
+        <th scope="col">Url mod</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for mod in mods.list_mod|sort((a, b) => b.date <=> a.date) %}
+        <tr>
+            <th scope="row">{{ mod.id }}</th>
+            <td>{{ mod.display_name }}</td>
+            <td><a href="{{ mod.url_server }}">{{ mod.url_server }}</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

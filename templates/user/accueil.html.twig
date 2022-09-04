@@ -1,47 +1,37 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container">
+    <div class="container-fluid" style="max-width: 92%">
         <h1 class="mb-5">Gestion des instances minecraft</h1>
         <div class="row mb-4">
             <div class="col-6">
-                <input type="text" class="form-control" name="url" id="url" placeholder="Url" aria-label="Url" aria-describedby="Url server">
+                <input type="text" class="form-control" name="idMod" id="idMod" placeholder="id mod" aria-label="idMod" aria-describedby="id mod">
             </div>
             <div class="col-6">
-                <button class="btn btn-primary col-12 mb-5" onclick="valider()">Valider</button>
+                <button class="btn btn-primary col-12 mb-5" onclick="ShowTable()">Valider</button>
             </div>
         </div>
+        <div id="table" class="mb-4"></div>
     </div>
 {% endblock %}
 
 {% block javascripts %}
     <script>
-        function valider()
+        function ShowTable()
         {
-            let url = $('#url').val();
-            // console.log(url);
+            let idMod = $('#idMod').val();
 
             $.ajax({
                 type: "POST",
-                url: "{{ path('get_url') }}",
+                url: '{{ path('show_modpack_list') }}',
+                dataType: 'html',
                 data: {
-                    url: url
+                    idMod: idMod
                 },
-                success: function (retour) {
-                    console.log(retour);
-                }
+                success: function(retour) {
+                    document.getElementById('table').innerHTML = retour;
+                },
             });
-
-            // let urlSplit = url.split('files/');
-            // console.log(urlSplit);
-            // if(urlSplit[1])
-            // {
-            //     let firstNumber = urlSplit[1].substring(0,4)
-            //     let secondNumber = urlSplit[1].substring(4,7)
-            //
-            //
-            //     // let urlRetour = 'https://media.forgecdn.net/files/' + firstNumber + '/' + secondNumber + '/';
-            // }
         }
 
     </script>
