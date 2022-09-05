@@ -1,44 +1,83 @@
-version: '3'
+version: "3.4"
 
 services:
-  database:
-    image: mysql
-    container_name: db_docker_symfony
+  php:
+    build:
+      context: .
+      target: app_php
+      args:
+        SYMFONY_VERSION: ${SYMFONY_VERSION:-}
+        STABILITY: ${STABILITY:-stable}
     restart: unless-stopped
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    networks:
-      dev:
     volumes:
-      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/mysql:/var/lib/mysql"
-
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin_docker_symfony
-    restart: unless-stopped
-    depends_on:
-      - database
-    ports:
-      - 8181:80
+      - php_socket:/var/run/php
+    healthcheck:
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
     environment:
-      PMA_HOST: database
-    networks:
-      dev:
+      # Run "composer require symfony/orm-pack" to install and configure Doctrine ORM
+      DATABASE_URL: DATABASE_URL=mysql://root:@192.168.1.61:8181/symfony_minecraft_instance
+      # Run "composer require symfony/mercure-bundle" to install and configure the Mercure integration
+      MERCURE_URL: ${CADDY_MERCURE_URL:-http://caddy/.well-known/mercure}
+      MERCURE_PUBLIC_URL: https://${SERVER_NAME:-localhost}/.well-known/mercure
+      MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeMe!}
 
-#  www:
-#    image: php:7.4-apache
-#    container_name: www_docker_symfony
-#    ports:
-#      - "8741:80"
-#    volumes:
-#      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/php:/etc/apache2/sites-enabled"
-#      - "/srv/dev-disk-by-uuid-70b38318-03df-4998-8205-a38f788b0005/R51/WebSite/www/html:/var/www"
+#  caddy:
+#    build:
+#      context: .
+#      target: app_caddy
+#    depends_on:
+#      - php
+#    environment:
+#      SERVER_NAME: ${SERVER_NAME:-localhost, caddy:80}
+#      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeMe!}
+#      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeMe!}
 #    restart: unless-stopped
-#    networks:
-#      - dev
+#    volumes:
+#      - php_socket:/var/run/php
+#      - caddy_data:/data
+#      - caddy_config:/config
+#    ports:
+#      # HTTP
+#      - target: 80
+#        published: ${HTTP_PORT:-8001}
+#        protocol: tcp
+#      # HTTPS
+#      - target: 443
+#        published: ${HTTPS_PORT:-4443}
+#        protocol: tcp
+#      # HTTP/3
+#      - target: 443
+#        published: ${HTTP3_PORT:-4443}
+#        protocol: udp
 
-networks:
-  dev:
+# Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###
+
+###> doctrine/doctrine-bundle ###
+#  database:
+#    image: postgres:${POSTGRES_VERSION:-14}-alpine
+#    environment:
+#      POSTGRES_DB: ${POSTGRES_DB:-app}
+#      # You should definitely change the password in production
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+#      POSTGRES_USER: ${POSTGRES_USER:-app}
+#    volumes:
+#      - db-data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
 
 volumes:
+  php_socket:
+  caddy_data:
+  caddy_config:
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###
+
+###> doctrine/doctrine-bundle ###
   db-data:
+###< doctrine/doctrine-bundle ###
